@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Button, Modal, SectionTitle, Tape } from '../components/Bits'
+import { Doodle } from '../components/Doodles'
 import { Heart, Sparkle } from '../components/Stickers'
 import { projects } from '../data'
 import { useTilt, useReveal } from '../hooks'
@@ -48,11 +49,15 @@ export default function Projects() {
 
   return (
     <section className="wrap">
-      <SectionTitle kicker="chapter three" script="things I've">
+      <SectionTitle kicker="chapter three" script="things I've" left="sparkles" right="heart">
         made
       </SectionTitle>
 
       <div className="filters reveal" role="group" aria-label="Filter projects">
+        <span className="filters-hint hand" aria-hidden="true">
+          pick one!
+          <Doodle name="arrowRight" color="green" delay={0.5} className="dd-filter-arrow" />
+        </span>
         {FILTERS.map((f) => (
           <button key={f.id} className={`filter ${filter === f.id ? 'is-on' : ''}`} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id}>
             {f.label}
@@ -60,10 +65,15 @@ export default function Projects() {
         ))}
       </div>
 
+      <div className="project-grid-wrap">
+        <Doodle name="flower" color="pink" delay={0.4} className="dd-grid-tr" wiggle />
+        <Doodle name="spiral" color="green" delay={0.6} className="dd-grid-bl" wiggle />
+        <Doodle name="star" color="pink" delay={0.8} className="dd-grid-mid" wiggle />
       <div className="project-grid" key={filter}>
         {list.map((p, i) => (
           <ProjectCard key={p.id} p={p} i={projects.indexOf(p)} onOpen={setOpen} />
         ))}
+      </div>
       </div>
 
       <Modal open={!!open} onClose={close} label={open?.title}>

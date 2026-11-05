@@ -57,19 +57,35 @@ export function useMagnet(strength = 0.3) {
   return ref
 }
 
-/* Reveal elements as they scroll into view (adds .is-in). */
+/* Reveal elements as they scroll into view.
+   Marks them with a data-in attribute (not a class) so React re-renders,
+   which rewrite className, can never un-reveal something. */
+/* Measure every doodle line so its pen animation covers exactly its real length.
+   (+1 so the very end of closed shapes like stars always meets up.) */
+export function measureDoodles() {
+  document.querySelectorAll('svg.doodle-svg path, svg.doodle path, svg.hl-line path').forEach((p) => {
+    if (p.style.getPropertyValue('--len')) return
+    try {
+      p.style.setProperty('--len', (p.getTotalLength() + 1).toFixed(2))
+    } catch {
+      /* not rendered yet: keeps the safe default and gets measured next time */
+    }
+  })
+}
+
 export function useReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal:not(.is-in)')
+    measureDoodles()
+    const els = document.querySelectorAll('.reveal:not([data-in])')
     if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
-      els.forEach((e) => e.classList.add('is-in'))
+      els.forEach((e) => e.setAttribute('data-in', ''))
       return
     }
     const io = new IntersectionObserver(
       (entries) =>
         entries.forEach((en) => {
           if (en.isIntersecting) {
-            en.target.classList.add('is-in')
+            en.target.setAttribute('data-in', '')
             io.unobserve(en.target)
           }
         }),

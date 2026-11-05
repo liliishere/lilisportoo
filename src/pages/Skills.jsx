@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button, SectionTitle, Tape } from '../components/Bits'
+import { Doodle } from '../components/Doodles'
 import { Flower, Leaf, Sparkle } from '../components/Stickers'
 import { projects, siteCard, skillGroups } from '../data'
 import { useTilt, burst, useReveal } from '../hooks'
@@ -52,10 +53,11 @@ export default function Skills() {
 
   return (
     <section className="wrap">
-      <SectionTitle kicker="chapter two" script="things I">
+      <SectionTitle kicker="chapter two" script="things I" left="burst" right="star">
         can do
       </SectionTitle>
-      <p className="lede center reveal">
+      <p className="lede center reveal lede-doodled">
+        <Doodle name="arrowDown" color="green" delay={0.8} className="dd-lede-arrow" />
         Tap a skill sticker to see where it shows up in my work <span className="hand">(hover for a hint!)</span>
       </p>
 
@@ -67,11 +69,13 @@ export default function Skills() {
 
       <div className="shelf reveal">
         <Tape color="moss" className="tape--top" />
+        <Doodle name="sparkles" color="pink" delay={0.3} className="dd-shelf-l" wiggle />
+        <Doodle name="flower" color="green" delay={0.6} className="dd-shelf-r" wiggle />
         <p className="shelf-label hand">
           {skill
             ? skill.used.length
               ? `${skill.name} lives in…`
-              : `${skill.name} — practised through coursework & teamwork ✿`
+              : `${skill.name}: practised through coursework & teamwork ✿`
             : 'pick a skill above ↑'}
         </p>
         <div className="shelf-row">

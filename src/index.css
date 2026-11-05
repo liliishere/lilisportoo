@@ -1,12 +1,12 @@
 :root {
-  /* palette — from "color pallette.jpeg" */
+  /* ---------- LIGHT palette (from "color pallette.jpeg") ---------- */
   --blush: #f4dfe6; /* lavender blush */
   --pink: #e0a3bb; /* amaranth pink */
   --azure: #d6e6e7; /* azure */
   --citron: #c5cc82; /* citron */
   --moss: #97a13b; /* moss green */
 
-  /* supporting tones (deeper shades of the palette, for readable text) */
+  /* deeper shades of the palette, for readable text */
   --pink-deep: #b8638a;
   --moss-deep: #5f6726;
   --cream: #fffbf6;
@@ -14,15 +14,168 @@
   --ink: #4b3b40;
   --ink-soft: #7a666c;
 
+  /* ---------- roles (these are what dark mode swaps) ---------- */
+  --bg: var(--cream);
+  --surface: #ffffff;
+  --edge: #ffffff;
+  --dot: rgba(224, 163, 187, 0.28);
+  --on-accent: #ffffff;
+  --on-deep: #ffffff;
+  --shadow-rgb: 75, 59, 64;
+  --accent-rgb: 184, 99, 138;
+  --glare: rgba(255, 255, 255, 0.55);
+  --margin-line: rgba(224, 163, 187, 0.6);
+
+  --note-citron: #e3e7b8;
+  --note-blush: #fbeef2;
+  --tab-2: #e6eac2;
+  --tab-3: #f9eef2;
+  --tab-bar-border: var(--pink);
+  --tape-azure: #b9d3d5;
+  --tape-citron: #dde2a6;
+  --chip-citron: #e9ecc6;
+  --chip-azure-ring: #a9c7c9;
+
+  --btn-shadow: var(--moss-deep);
+  --btn-hover-shadow: #8e4a6a;
+  --marquee-flower: var(--blush);
+
+  --awning-a: var(--moss);
+  --awning-b: var(--blush);
+  --awning-stitch: rgba(255, 255, 255, 0.7);
+  --header-wash: rgba(244, 223, 230, 0.75);
+
+  --photo-frame: #ffffff;
+  --photo-ink: var(--pink-deep);
+
+  --env-body: #fbeef2;
+  --env-fold: rgba(184, 99, 138, 0.35);
+  --env-flap: #e9b9cb;
+  --lining-a: #e0a3bb;
+  --lining-b: #f4dfe6;
+  --seal: var(--moss);
+  --seal-ring: rgba(255, 255, 255, 0.6);
+  --letter-bg: #ffffff;
+  --letter-line: var(--azure);
+  --letter-ink: var(--ink);
+  --letter-accent: var(--pink-deep);
+  --letter-accent-2: var(--moss-deep);
+  --ray: rgba(224, 163, 187, 0.35);
+  --glow: rgba(244, 223, 230, 0.95);
+  --ring: rgba(151, 161, 59, 0.45);
+
+  --notebook-bg: #ffffff;
+  --notebook-ink: var(--ink);
+  --notebook-line: var(--azure);
+  --doodle: #e0a3bb;
+  --doodle-2: #97a13b;
+
+  --scrap-paper: #ffffff;
+  --scrap-paper-2: #fffdf6;
+  --scrap-line: #cfe2e3;
+  --scrap-margin: rgba(224, 163, 187, 0.75);
+  --scrap-pink: #f4dfe6;
+  --scrap-pink-dot: #ffffff;
+  --scrap-green: #e3e7b8;
+  --scrap-stripe: #f4dfe6;
+  --scrap-ink: #b8638a;
+  --scrap-opacity: 1;
+
   --font-display: 'Fraunces', Georgia, serif;
   --font-hand: 'Caveat', 'Comic Sans MS', cursive;
   --font-body: 'DM Sans', system-ui, sans-serif;
 
-  --shadow: 0 2px 0 rgba(75, 59, 64, 0.06), 0 14px 30px -12px rgba(75, 59, 64, 0.28);
-  --shadow-lift: 0 4px 0 rgba(75, 59, 64, 0.06), 0 26px 40px -14px rgba(75, 59, 64, 0.35);
+  --shadow: 0 2px 0 rgba(var(--shadow-rgb), 0.06), 0 14px 30px -12px rgba(var(--shadow-rgb), 0.28);
+  --shadow-lift: 0 4px 0 rgba(var(--shadow-rgb), 0.06), 0 26px 40px -14px rgba(var(--shadow-rgb), 0.35);
   --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   color-scheme: light;
+}
+
+/* ---------- DARK palette ----------
+   "Hot chocolate": oat milk #e8dbcc · favorite mug #5f0c2f · dark chocolate #3c0e18 · cherry marshmallow #eaadc1
+   "Wedding": wine #651f30 · dusty mauve #a8697a · cocoa #3e2c22 · candlelit cream #eddfc4 · sage #b7bb88 · olive print #6e6b41 */
+:root[data-theme='dark'] {
+  --blush: #5f0c2f; /* favorite mug: pink notes & tabs */
+  --pink: #a8697a; /* dusty mauve: active tab, borders, tape */
+  --azure: #3e2c22; /* cocoa: "azure" notes & lines */
+  --citron: #b7bb88; /* sage */
+  --moss: #6e6b41; /* olive print: buttons, marquee */
+
+  --pink-deep: #eaadc1; /* cherry marshmallow: script headings & accents */
+  --moss-deep: #b7bb88; /* sage: kickers & secondary accents */
+  --cream: #3c0e18; /* dark chocolate: page */
+  --paper: #47141f;
+  --ink: #eddfc4; /* candlelit cream: text */
+  --ink-soft: #cdb8a9;
+
+  --bg: #3c0e18;
+  --surface: #4b1a25;
+  --edge: #e8dbcc;
+  --dot: rgba(234, 173, 193, 0.11);
+  --on-accent: #eddfc4;
+  --on-deep: #3c0e18;
+  --shadow-rgb: 18, 3, 7;
+  --accent-rgb: 234, 173, 193;
+  --glare: rgba(237, 223, 196, 0.22);
+  --margin-line: rgba(234, 173, 193, 0.45);
+
+  --note-citron: #6e6b41;
+  --note-blush: #651f30;
+  --tab-2: #6e6b41;
+  --tab-3: #651f30;
+  --tab-bar-border: #a8697a;
+  --tape-azure: #8b6f5f;
+  --tape-citron: #8f8c5c;
+  --chip-citron: #6e6b41;
+  --chip-azure-ring: #7a5f50;
+
+  --btn-shadow: #45431f;
+  --btn-hover-shadow: #a8697a;
+  --marquee-flower: #eaadc1;
+
+  --awning-a: #a8697a;
+  --awning-b: #e8dbcc;
+  --awning-stitch: rgba(234, 173, 193, 0.75);
+  --header-wash: rgba(101, 31, 48, 0.55);
+
+  --photo-frame: #e8dbcc; /* polaroids stay oat-milk paper */
+  --photo-ink: #651f30;
+
+  --env-body: #e8dbcc;
+  --env-fold: rgba(101, 31, 48, 0.3);
+  --env-flap: #d9c7b4;
+  --lining-a: #651f30;
+  --lining-b: #a8697a;
+  --seal: #651f30;
+  --seal-ring: rgba(237, 223, 196, 0.5);
+  --letter-bg: #f3e9da;
+  --letter-line: rgba(168, 105, 122, 0.25);
+  --letter-ink: #3c0e18;
+  --letter-accent: #651f30;
+  --letter-accent-2: #6e6b41;
+  --ray: rgba(234, 173, 193, 0.16);
+  --glow: rgba(168, 105, 122, 0.55);
+  --ring: rgba(183, 187, 136, 0.45);
+
+  --notebook-bg: #f1e6d6; /* candlelit paper, like the letter */
+  --notebook-ink: #3c0e18;
+  --notebook-line: rgba(168, 105, 122, 0.3);
+  --doodle: #eaadc1;
+  --doodle-2: #b7bb88;
+
+  --scrap-paper: #e8dbcc; /* oat milk */
+  --scrap-paper-2: #d9c7b4;
+  --scrap-line: rgba(101, 31, 48, 0.22);
+  --scrap-margin: rgba(168, 105, 122, 0.8);
+  --scrap-pink: #651f30; /* wine */
+  --scrap-pink-dot: rgba(234, 173, 193, 0.45);
+  --scrap-green: #6e6b41; /* olive */
+  --scrap-stripe: #a8697a; /* mauve */
+  --scrap-ink: #651f30;
+  --scrap-opacity: 0.88;
+
+  color-scheme: dark;
 }
 
 *,
@@ -42,9 +195,10 @@ body {
   font-size: 17px;
   line-height: 1.6;
   color: var(--ink);
-  background-color: var(--cream);
+  background-color: var(--bg);
   /* faint polka dots, like a scrapbook backing paper */
-  background-image: radial-gradient(rgba(224, 163, 187, 0.28) 1.6px, transparent 1.8px);
+  background-image: radial-gradient(var(--dot) 1.6px, transparent 1.8px);
+  transition: background-color 0.4s ease, color 0.4s ease;
   background-size: 26px 26px;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -59,6 +213,12 @@ button,
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 100 100'%3E%3Cpath d='M50 4c4 31 15 42 46 46-31 4-42 15-46 46-4-31-15-42-46-46 31-4 42-15 46-46z' fill='%2397A13B' stroke='%23fff' stroke-width='7'/%3E%3C/svg%3E")
       16 16,
     pointer;
+}
+
+#root {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
 }
 
 img {

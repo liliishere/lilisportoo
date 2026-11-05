@@ -2,11 +2,12 @@ import { useState } from 'react'
 import photo from '../assets/rebecca.jpg'
 import { useReveal } from '../hooks'
 import { Button, Polaroid, SectionTitle, Sticker, Tape } from '../components/Bits'
+import { DoodleHeading } from '../components/Doodles'
 import { Arrow, Bow, Daisy, Flower, Leaf, Sparkle } from '../components/Stickers'
 import { profile, projects } from '../data'
 
 const FACTS = [
-  { front: 'studying', back: `${profile.study} at ${profile.school} — ${profile.semester.toLowerCase()}`, color: 'pink', rot: -3 },
+  { front: 'studying', back: `${profile.study} at ${profile.school}, ${profile.semester.toLowerCase()}`, color: 'pink', rot: -3 },
   { front: 'into', back: 'UI/UX design, front-end development & digital product innovation', color: 'azure', rot: 2 },
   { front: 'designed for', back: 'healthcare · education · travel · AI-powered apps', color: 'citron', rot: -1.5 },
   { front: 'how I work', back: 'user-centered, accessibility-minded & happiest in a multidisciplinary team', color: 'blush', rot: 2.5 },
@@ -23,7 +24,7 @@ function FlipNote({ front, back, color, rot }) {
       aria-label={`${front}: ${back}`}
     >
       <span className="flip-inner">
-        <span className={`flip-face sticky-note sticky--${color}`}>
+        <span className={`flip-face flip-face--front sticky-note sticky--${color}`}>
           <Tape color={color === 'pink' ? 'moss' : 'pink'} className="tape--top" />
           <span className="hand flip-front">{front}…</span>
           <small>hover or tap to peek</small>
@@ -41,7 +42,7 @@ export default function About() {
   const timeline = [...projects].sort((a, b) => a.year - b.year)
   return (
     <section className="wrap">
-      <SectionTitle kicker="chapter one" script="a little">
+      <SectionTitle kicker="chapter one" script="a little" left="heart" right="sparkles">
         about me
       </SectionTitle>
 
@@ -61,7 +62,7 @@ export default function About() {
           <p>{profile.about}</p>
           <p>{profile.about2}</p>
           <p>
-            I love the moment a messy idea turns into something people can actually <em>use</em> — sketching the flow,
+            I love the moment a messy idea turns into something people can actually <em>use</em>. Sketching the flow,
             polishing the pixels in Figma, then building it for real with HTML, CSS, JavaScript & React.js.
           </p>
           <p className="hand notebook-sign">
@@ -70,18 +71,18 @@ export default function About() {
         </article>
       </div>
 
-      <h2 className="center reveal">
-        <span className="script">some</span> fun facts
-      </h2>
+      <DoodleHeading script="some" left="burst" right="spiral" className="reveal">
+        fun facts
+      </DoodleHeading>
       <div className="flip-grid">
         {FACTS.map((f) => (
           <FlipNote key={f.front} {...f} />
         ))}
       </div>
 
-      <h2 className="center reveal">
-        <span className="script">my little</span> journey
-      </h2>
+      <DoodleHeading script="my little" left="star" right="loop" className="reveal">
+        journey
+      </DoodleHeading>
       <ol className="journey">
         {timeline.map((p, i) => (
           <li key={p.id} className={`reveal journey-item ${i % 2 ? 'right' : 'left'}`}>

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMagnet, useTilt, burst, prefersReducedMotion } from '../hooks'
+import { DoodleHeading } from './Doodles'
 
-/* Draggable sticker — pick it up and move it anywhere around the page. */
+/* Draggable sticker: pick it up and move it anywhere around the page. */
 export function Sticker({ children, className = '', style }) {
   const ref = useRef(null)
   const s = useRef({ x: 0, y: 0, ox: 0, oy: 0, down: false })
@@ -36,7 +37,7 @@ export function Sticker({ children, className = '', style }) {
       onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
-      title="psst — you can drag me!"
+      title="psst, you can drag me!"
       aria-hidden="true"
     >
       <div className="sticker-inner">{children}</div>
@@ -91,14 +92,13 @@ export function Marquee({ items, tone = 'moss' }) {
   )
 }
 
-export function SectionTitle({ kicker, children, script }) {
+export function SectionTitle({ kicker, children, script, left = 'burst', right = 'sparkles' }) {
   return (
     <header className="section-title reveal">
       {kicker && <p className="kicker">{kicker}</p>}
-      <h1>
-        {script && <span className="script">{script} </span>}
+      <DoodleHeading as="h1" script={script} left={left} right={right}>
         {children}
-      </h1>
+      </DoodleHeading>
     </header>
   )
 }

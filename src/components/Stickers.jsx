@@ -121,3 +121,28 @@ export function Icon({ name, size = 30 }) {
     return (<svg {...p}><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><path d="M17.5 6.5v.01" /></svg>)
   return null
 }
+
+export function Sun({ size = 30 }) {
+  return (
+    <svg className="sun" viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
+      {Array.from({ length: 8 }, (_, i) => i * 45).map((a) => (
+        <ellipse key={a} cx="50" cy="13" rx="7" ry="11" fill="#C5CC82" stroke="#fff" strokeWidth="3" transform={`rotate(${a} 50 50)`} />
+      ))}
+      <circle cx="50" cy="50" r="23" fill="#E0A3BB" stroke="#fff" strokeWidth="4" />
+      <circle cx="42" cy="47" r="2.6" fill="#4B3B40" />
+      <circle cx="58" cy="47" r="2.6" fill="#4B3B40" />
+      <path d="M43 56c4 4 10 4 14 0" stroke="#4B3B40" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function Moon({ size = 30 }) {
+  return (
+    <svg className="moon" viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
+      <path d="M62 10a40 40 0 1 0 28 62A34 34 0 0 1 62 10z" fill="#EAADC1" stroke="#EDDFC4" strokeWidth="4" strokeLinejoin="round" />
+      <circle cx="44" cy="52" r="2.6" fill="#3C0E18" />
+      <path d="M38 62c4 3 9 3 12 0" stroke="#3C0E18" strokeWidth="2.6" fill="none" strokeLinecap="round" />
+      <path d="M80 18l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#B7BB88" />
+    </svg>
+  )
+}

@@ -1,7 +1,8 @@
 import photo from '../assets/rebecca.jpg'
 import { Button, Marquee, Polaroid, Sticker, Tape } from '../components/Bits'
+import { DoodleHeading } from '../components/Doodles'
 import { Arrow, Bow, Butterfly, Cherry, Daisy, Flower, Heart, Leaf, Sparkle, Squiggle } from '../components/Stickers'
-import { useTilt, burst, useReveal } from '../hooks'
+import { useTilt, burst, useReveal, prefersReducedMotion } from '../hooks'
 import { profile, projects } from '../data'
 
 function PeekCard({ href, color, title, text, sticker, rot }) {
@@ -21,19 +22,58 @@ export default function Home() {
   useReveal()
   const wave = (e) => burst(e.clientX, e.clientY)
 
+  // hovering the name redraws the underline (once per hover, never on mouse-out)
+  const redraw = (e) => {
+    if (prefersReducedMotion()) return
+    const paths = e.currentTarget.querySelectorAll('.hl-line path')
+    paths.forEach((path, i) => {
+      if (path.getAnimations().some((a) => a.id === 'redraw' && a.playState === 'running')) return
+      const len = parseFloat(path.style.getPropertyValue('--len')) || path.getTotalLength()
+      const anim = path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], {
+        duration: 850,
+        delay: i * 300,
+        easing: 'cubic-bezier(0.6, 0, 0.3, 1)',
+        fill: 'backwards',
+      })
+      anim.id = 'redraw'
+    })
+  }
+
   return (
     <>
       <section className="hero dots">
         <div className="hero-copy">
           <p className="kicker reveal">portfolio · 2026</p>
-          <h1 className="hero-title reveal">
+          <h1 className="hero-title reveal" onMouseEnter={redraw}>
             <span className="script hero-hello" onClick={wave}>
+              <svg className="doodle doodle--green d-burst" viewBox="0 0 40 40" aria-hidden="true">
+                <path d="M30 8 L22 2" />
+                <path d="M24 16 L8 12" />
+                <path d="M28 25 L16 32" />
+              </svg>
               hello there,
+              <svg className="doodle d-heart doodle-wiggle" viewBox="0 0 40 40" aria-hidden="true">
+                <path d="M20 34 C6 24 3 15 8 9 C13 4 19 7 20 13 C21 7 28 4 32 9 C37 15 33 24 20 34 Z" />
+              </svg>
             </span>
-            I&apos;m <span className="hl">Rebecca</span>
+            I&apos;m{' '}
+            <span className="hl">
+              Rebecca
+              <svg className="hl-line" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true">
+                <path className="line-main" d="M4 20 C50 10 110 26 160 18 S250 8 296 16" />
+                <path className="line-echo" d="M30 33 C90 26 170 38 236 30 C252 28 262 27 270 29" />
+              </svg>
+              <svg className="doodle d-star doodle-wiggle" viewBox="0 0 40 40" aria-hidden="true">
+                <path d="M20 4 L24 15 L36 16 L26 23 L30 35 L20 28 L10 35 L14 23 L4 16 L16 15 Z" />
+              </svg>
+            </span>
             <br />
-            <em>Jielian</em>
-            <Sparkle size={34} fill="#E0A3BB" />
+            <span className="hl-wrap">
+              <em>Jielian</em>
+              <svg className="doodle doodle--green d-loop" viewBox="0 0 80 40" aria-hidden="true">
+                <path d="M2 30 C14 30 22 26 26 18 C30 8 20 4 17 12 C14 22 30 30 44 26 C54 23 58 16 64 16 C70 16 70 24 78 22" />
+              </svg>
+            </span>
           </h1>
           <p className="hand hero-role reveal">
             {profile.role} ✿ in the making
@@ -41,7 +81,7 @@ export default function Home() {
           <Squiggle />
           <p className="lede reveal">
             {profile.study} student at {profile.school}, designing friendly, accessible interfaces for healthcare,
-            education, travel & AI — and then bringing them to life with code.
+            education, travel & AI, and then bringing them to life with code.
           </p>
           <div className="btn-row reveal">
             <Button href="#/projects">see my work</Button>
@@ -86,12 +126,12 @@ export default function Home() {
 
       <section className="peeks">
         <p className="kicker center reveal">flip through the scrapbook</p>
-        <h2 className="center reveal">
-          <span className="script">pick a</span> page
-        </h2>
+        <DoodleHeading script="pick a" left="burst" right="flower" className="reveal">
+          page
+        </DoodleHeading>
         <div className="peek-grid">
           <PeekCard href="#/about" color="pink" rot={-3} title="About me" text="who I am, what I love & where I'm headed" sticker={<Flower size={52} />} />
-          <PeekCard href="#/skills" color="azure" rot={2} title="Skills" text="design, code & people things — React.js included" sticker={<Sparkle size={46} fill="#97A13B" />} />
+          <PeekCard href="#/skills" color="azure" rot={2} title="Skills" text="design, code & people things, React.js included" sticker={<Sparkle size={46} fill="#97A13B" />} />
           <PeekCard href="#/projects" color="citron" rot={-1.5} title="Projects" text="four little worlds I helped design & build" sticker={<Leaf size={50} />} />
           <PeekCard href="#/contact" color="blush" rot={3} title="Say hi" text="email, LinkedIn, GitHub & Instagram" sticker={<Heart size={46} />} />
         </div>

@@ -37,6 +37,7 @@ h2 {
   max-width: 34rem;
 }
 .lede.center {
+  max-width: 40rem;
   margin: 0 auto 2.5rem;
 }
 .lede .hand {
@@ -58,7 +59,7 @@ h2 {
   translate: 0 26px;
   transition: opacity 0.7s ease, translate 0.7s var(--bounce);
 }
-.reveal.is-in {
+.reveal[data-in] {
   opacity: 1;
   translate: 0 0;
 }
@@ -79,23 +80,313 @@ h2 {
   }
 }
 
-/* ============ header ============ */
-.awning {
-  height: 26px;
-  background: repeating-linear-gradient(90deg, var(--moss) 0 34px, var(--blush) 34px 68px);
+/* ============ paper scraps around the edges ============ */
+.scraps {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.page,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+.scrap {
+  position: absolute;
+  opacity: var(--scrap-opacity);
+  rotate: var(--r);
+  box-shadow: 0 10px 18px -10px rgba(var(--shadow-rgb), 0.35);
+  animation: scrap-drift 11s ease-in-out var(--d) infinite alternate;
+}
+.scrap--left {
+  left: calc(var(--out, 48px) * -1);
+}
+.scrap--right {
+  right: calc(var(--out, 48px) * -1);
+}
+@keyframes scrap-drift {
+  to {
+    translate: 0 -10px;
+    rotate: calc(var(--r) + 2deg);
+  }
+}
+.scrap-tape {
+  top: -12px;
+  width: 70px;
+  height: 22px;
+}
+/* notebook page with a torn bottom */
+.scrap--lined {
+  background-color: var(--scrap-paper);
+  background-image: linear-gradient(90deg, transparent 26px, var(--scrap-margin) 26px 28px, transparent 28px),
+    repeating-linear-gradient(transparent 0 17px, var(--scrap-line) 17px 19px);
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 92% 97%, 84% 91%, 75% 98%, 66% 92%, 57% 99%, 48% 92%, 38% 98%, 28% 91%, 18% 97%, 9% 92%, 0 98%);
+}
+/* graph paper */
+.scrap--grid {
+  background-color: var(--scrap-paper-2);
+  background-image: linear-gradient(var(--scrap-line) 1px, transparent 1px), linear-gradient(90deg, var(--scrap-line) 1px, transparent 1px);
+  background-size: 14px 14px;
+  border-radius: 2px;
+}
+/* polka-dot paper */
+.scrap--dots {
+  background-color: var(--scrap-pink);
+  background-image: radial-gradient(var(--scrap-pink-dot) 3px, transparent 3.5px);
+  background-size: 18px 18px;
+  border-radius: 3px;
+}
+/* lace doily */
+.scrap--doily {
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 22%, var(--scrap-paper) 22.5% 30%, transparent 30.5% 34%, var(--scrap-paper) 34.5%),
+    var(--scrap-paper);
+  background: repeating-conic-gradient(var(--scrap-paper) 0 8deg, color-mix(in srgb, var(--scrap-paper) 80%, var(--scrap-line)) 8deg 16deg);
+  border: 9px dotted var(--scrap-paper);
+  outline: 3px dashed color-mix(in srgb, var(--scrap-paper) 70%, var(--scrap-margin));
+  outline-offset: -22px;
+  box-shadow: none;
+  filter: drop-shadow(0 8px 10px rgba(var(--shadow-rgb), 0.18));
+}
+/* little ticket stub */
+.scrap--ticket {
+  display: grid;
+  place-items: center;
+  background: var(--scrap-paper);
+  border: 2px dashed var(--scrap-margin);
+  border-radius: 8px;
+  mask: radial-gradient(circle at 0 50%, transparent 11px, #000 11.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 11px, #000 11.5px) right / 51% 100% no-repeat;
+}
+.scrap-ticket-text {
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  color: var(--scrap-ink);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+.scrap-ticket-text i {
+  font-style: normal;
+  color: var(--moss);
+}
+/* striped paper */
+.scrap--stripe {
+  background: repeating-linear-gradient(90deg, var(--scrap-stripe) 0 12px, var(--scrap-paper) 12px 24px);
+  border-radius: 2px;
+}
+/* sticky note with a doodle */
+.scrap--note {
+  display: grid;
+  place-items: center;
+  background: var(--scrap-green);
+  border-radius: 2px 2px 16px 2px;
+}
+.scrap-note-text {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-hand);
+  font-size: 1.7rem;
+  color: var(--scrap-ink);
+  rotate: -8deg;
+}
+
+/* ============ doodles (pen-drawn, draw in when scrolled to) ============ */
+.doodle-svg {
+  /* sit above neighbouring cards so no doodle gets tucked underneath one */
+  position: relative;
+  z-index: 3;
+  fill: none;
+  stroke: var(--doodle);
+  stroke-width: var(--sw, 3);
+  overflow: visible;
+  pointer-events: none;
+}
+.doodle-svg--green {
+  stroke: var(--doodle-2);
+}
+.doodle-svg path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* --len is each line's real measured length (set in hooks.js), so the "pen"
+     always travels the whole way: dash = len, gap = 2 x len. */
+  stroke-dasharray: var(--len, 4000) calc(var(--len, 4000) * 2);
+  stroke-dashoffset: var(--len, 4000);
+  animation: pen 0.9s cubic-bezier(0.6, 0, 0.3, 1) var(--delay, 0.3s) forwards;
+  animation-play-state: paused;
+}
+.doodle-svg[data-in] path {
+  animation-play-state: running;
+}
+.title-inner,
+.script-doodled {
+  position: relative;
+  display: inline-block;
+}
+.dd-under {
+  position: absolute;
+  left: -4%;
+  width: 108%;
+  bottom: -0.14em;
+  height: 0.28em;
+  --sw: 2.4;
+}
+.dd-left,
+.dd-right {
+  position: absolute;
+  width: auto;
+}
+.dd-left {
+  right: 100%;
+  margin-right: 0.3em;
+  top: calc(50% - 0.32em);
+  height: 0.64em;
+}
+.dd-right {
+  left: 100%;
+  margin-left: 0.25em;
+  top: -0.15em;
+  height: 0.6em;
+}
+/* arrows need more room than the little icons */
+.dd-right.dd-arrowDown {
+  height: 0.95em;
+  top: 0.05em;
+}
+.dd-right.dd-loop {
+  height: 0.5em;
+  top: 0.35em;
+}
+h2.doodle-heading {
+  margin-top: 4.5rem;
+}
+
+/* page-specific doodles */
+.lede-doodled {
   position: relative;
 }
-.awning::after {
-  /* scalloped edge */
+.dd-lede-arrow {
+  position: absolute;
+  right: -78px;
+  top: -6px;
+  height: 52px;
+  width: auto;
+}
+.dd-shelf-l,
+.dd-shelf-r {
+  position: absolute;
+  top: 1.5rem;
+  height: 34px;
+  width: auto;
+}
+.dd-shelf-l {
+  left: 20%;
+}
+.dd-shelf-r {
+  right: 20%;
+}
+.filters {
+  position: relative;
+}
+.filters-hint {
+  position: absolute;
+  right: calc(50% + 13rem);
+  top: 50%;
+  margin-top: -1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+  font-size: 1.4rem;
+  color: var(--pink-deep);
+  rotate: -6deg;
+}
+.dd-filter-arrow {
+  height: 30px;
+  width: auto;
+}
+.project-grid-wrap {
+  position: relative;
+}
+.dd-grid-tr,
+.dd-grid-bl,
+.dd-grid-mid {
+  position: absolute;
+  width: auto;
+}
+.dd-grid-tr {
+  top: -46px;
+  right: -26px;
+  height: 50px;
+}
+.dd-grid-bl {
+  bottom: -34px;
+  left: -34px;
+  height: 46px;
+}
+.dd-grid-mid {
+  left: calc(50% - 18px);
+  top: calc(50% - 18px);
+  height: 36px;
+}
+.stamps-doodled {
+  position: relative;
+}
+.dd-stamps-wave {
+  --sw: 2;
+  position: absolute;
+  left: calc(50% - 90px);
+  bottom: -52px;
+  width: 180px;
+  height: 22px;
+}
+.dd-stamps-heart {
+  position: absolute;
+  right: -28px;
+  top: -44px;
+  height: 38px;
+  width: auto;
+}
+
+/* ============ header ============ */
+.awning {
+  position: relative;
+  z-index: 6;
+  height: 22px;
+  background: repeating-linear-gradient(90deg, var(--awning-a) 0 44px, var(--awning-b) 44px 88px);
+}
+.awning::before {
+  /* little stitched seam along the fabric */
   content: '';
   position: absolute;
   left: 0;
   right: 0;
-  top: 100%;
-  height: 14px;
-  background: radial-gradient(circle at 17px 0, var(--moss) 17px, transparent 17.5px) 0 0 / 68px 14px repeat-x,
-    radial-gradient(circle at 51px 0, var(--blush) 17px, transparent 17.5px) 0 0 / 68px 14px repeat-x;
-  z-index: 2;
+  bottom: 5px;
+  border-bottom: 2px dashed var(--awning-stitch);
+  z-index: 3;
+}
+.awning::after {
+  /* fully rounded scallops, softly shadowed so the awning floats over the page */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - 1px);
+  height: 22px;
+  background: radial-gradient(circle at 22px 0, var(--awning-a) 21.5px, transparent 22px) 0 0 / 88px 22px repeat-x,
+    radial-gradient(circle at 66px 0, var(--awning-b) 21.5px, transparent 22px) 0 0 / 88px 22px repeat-x;
+  filter: drop-shadow(0 5px 4px rgba(var(--shadow-rgb), 0.14));
+}
+.header-fade {
+  /* soft wash under the awning so it melts into the page instead of stopping hard */
+  position: absolute;
+  inset: 0 0 auto;
+  height: 220px;
+  background: radial-gradient(120% 100% at 50% 0%, var(--header-wash), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .topbar {
@@ -103,71 +394,220 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.6rem 2rem 0.8rem;
+  padding: 2.9rem 2rem 0.4rem;
   max-width: 1240px;
   margin: 0 auto;
   position: relative;
   z-index: 5;
 }
+/* ---- logo: a little name-tag sticker ---- */
 .logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 1.05rem 0.38rem 0.45rem;
+  text-decoration: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border: 2px dashed var(--tab-bar-border);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--surface) 82%, transparent), 0 10px 22px -14px rgba(var(--shadow-rgb), 0.55);
+  rotate: -2deg;
+  transition: rotate 0.5s var(--bounce), scale 0.5s var(--bounce);
+}
+.logo:hover {
+  rotate: 1deg;
+  scale: 1.05;
+}
+.logo-tape {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  width: 44px;
+  height: 16px;
+  rotate: 8deg;
+  background: repeating-linear-gradient(45deg, var(--citron) 0 6px, color-mix(in srgb, var(--citron) 65%, var(--edge)) 6px 12px);
+  opacity: 0.9;
+  clip-path: polygon(4% 0, 96% 0, 100% 25%, 96% 50%, 100% 75%, 96% 100%, 4% 100%, 0 75%, 4% 50%, 0 25%);
+}
+.logo-flowers {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex: none;
+}
+.logo-flower {
+  position: absolute;
+  display: block;
+  line-height: 0;
+  filter: drop-shadow(1px 2px 0 rgba(var(--shadow-rgb), 0.18));
+}
+.logo-flower--big {
+  inset: 0;
+  animation: spin 9s linear infinite;
+}
+.logo-flower--small {
+  right: -8px;
+  bottom: -6px;
+  animation: spin 6s linear infinite reverse;
+}
+.logo-spark {
+  position: absolute;
+  top: -8px;
+  left: -6px;
+  color: var(--moss);
+  font-size: 0.95rem;
+  animation: twinkle 2.2s ease-in-out infinite;
+}
+.logo:hover .logo-flower--big {
+  animation-duration: 1.2s;
+}
+.logo:hover .logo-flower--small {
+  animation-duration: 0.9s;
+}
+.logo-text {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
+  line-height: 1;
+}
+.logo-name {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.4rem;
   font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--ink);
 }
-.logo em {
+.logo-name em {
+  font-style: italic;
+  font-weight: 400;
   color: var(--pink-deep);
+  margin-left: 0.3rem;
 }
-.logo svg {
-  transition: rotate 0.8s var(--bounce);
+.logo-letter {
+  display: inline-block;
+  /* letters hop in when the page loads... */
+  animation: letter-in 0.7s var(--bounce) calc(var(--i) * 45ms + 0.2s) both;
 }
-.logo:hover svg {
-  rotate: 180deg;
+/* ...and do a little wave on hover */
+.logo:hover .logo-letter {
+  animation: letter-hop 0.55s ease-in-out calc(var(--i) * 40ms) both;
+}
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-12deg) scale(0.6);
+  }
+}
+@keyframes letter-hop {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-7px) rotate(-6deg);
+  }
+  70% {
+    transform: translateY(1px) rotate(3deg);
+  }
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 140;
+  }
 }
 
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
 .tabs {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+  border: 2px dashed var(--tab-bar-border);
+  box-shadow: 0 8px 22px -14px rgba(var(--shadow-rgb), 0.45);
+  backdrop-filter: blur(6px);
 }
 .tab {
   --c: var(--blush);
   font-family: var(--font-hand);
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   line-height: 1;
   text-decoration: none;
-  padding: 0.5rem 1rem 0.55rem;
-  border-radius: 14px 14px 6px 6px;
+  padding: 0.55rem 1.05rem 0.6rem;
+  border-radius: 999px;
   background: var(--c);
   border: 2px solid transparent;
   transition: transform 0.35s var(--bounce), background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 3px 0 rgba(75, 59, 64, 0.08);
+  box-shadow: inset 0 -3px 0 rgba(var(--shadow-rgb), 0.08);
 }
 .tab--1 {
   --c: var(--azure);
 }
 .tab--2 {
-  --c: #e6eac2;
+  --c: var(--tab-2);
 }
 .tab--3 {
-  --c: #f9eef2;
+  --c: var(--tab-3);
 }
 .tab:hover {
-  transform: translateY(-4px) rotate(-3deg);
+  transform: translateY(-3px) rotate(-3deg);
 }
 .tab:nth-child(even):hover {
-  transform: translateY(-4px) rotate(3deg);
+  transform: translateY(-3px) rotate(3deg);
 }
 .tab.is-active {
   background: var(--pink);
-  color: #fff;
-  border-color: #fff;
-  box-shadow: 0 0 0 2px var(--pink), var(--shadow);
-  transform: translateY(-2px);
+  color: var(--on-accent);
+  border-color: var(--edge);
+  box-shadow: 0 0 0 2px var(--pink), 0 6px 14px -6px rgba(var(--shadow-rgb), 0.5);
+}
+
+.theme-toggle {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+  border: 2px dashed var(--tab-bar-border);
+  color: var(--pink-deep);
+  box-shadow: 0 8px 22px -14px rgba(var(--shadow-rgb), 0.45);
+  transition: rotate 0.6s var(--bounce), scale 0.4s var(--bounce);
+}
+.theme-toggle:hover {
+  rotate: 25deg;
+  scale: 1.08;
+}
+.theme-toggle svg {
+  position: absolute;
+  transition: opacity 0.35s, scale 0.5s var(--bounce), rotate 0.6s var(--bounce);
+}
+.theme-toggle .moon,
+:root[data-theme='dark'] .theme-toggle .sun {
+  opacity: 0;
+  scale: 0.3;
+  rotate: -90deg;
+}
+:root[data-theme='dark'] .theme-toggle .moon {
+  opacity: 1;
+  scale: 1;
+  rotate: 0deg;
+}
+
+/* the circular "paint" reveal when switching themes */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 /* ============ tape / polaroid / tilt ============ */
@@ -178,7 +618,7 @@ h2 {
   z-index: 3;
   opacity: 0.88;
   --t: var(--pink);
-  background: repeating-linear-gradient(45deg, var(--t) 0 7px, color-mix(in srgb, var(--t) 70%, #fff) 7px 14px);
+  background: repeating-linear-gradient(45deg, var(--t) 0 7px, color-mix(in srgb, var(--t) 70%, var(--edge)) 7px 14px);
   clip-path: polygon(3% 0, 97% 0, 100% 20%, 97% 40%, 100% 60%, 97% 80%, 100% 100%, 3% 100%, 0 80%, 3% 60%, 0 40%, 3% 20%);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   pointer-events: none;
@@ -187,10 +627,10 @@ h2 {
   --t: var(--citron);
 }
 .tape--azure {
-  --t: #b9d3d5;
+  --t: var(--tape-azure);
 }
 .tape--citron {
-  --t: #dde2a6;
+  --t: var(--tape-citron);
 }
 .tape--blush {
   --t: var(--blush);
@@ -225,7 +665,7 @@ h2 {
 .polaroid {
   position: relative;
   margin: 0;
-  background: #fff;
+  background: var(--photo-frame);
   padding: 14px 14px 0;
   box-shadow: var(--shadow);
   border-radius: 4px;
@@ -249,12 +689,12 @@ h2 {
   text-align: center;
   font-size: 1.6rem;
   padding: 0.5rem 0 0.8rem;
-  color: var(--pink-deep);
+  color: var(--photo-ink);
 }
 .glare {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.55), transparent 55%);
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), var(--glare), transparent 55%);
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
@@ -270,7 +710,7 @@ h2 {
   touch-action: none;
   user-select: none;
   cursor: grab;
-  filter: drop-shadow(2px 4px 0 rgba(75, 59, 64, 0.12));
+  filter: drop-shadow(2px 4px 0 rgba(var(--shadow-rgb), 0.12));
   transition: filter 0.2s;
 }
 .sticker-inner {
@@ -287,7 +727,7 @@ h2 {
 }
 .sticker.is-grabbed {
   cursor: grabbing;
-  filter: drop-shadow(6px 14px 4px rgba(75, 59, 64, 0.22));
+  filter: drop-shadow(6px 14px 4px rgba(var(--shadow-rgb), 0.22));
   z-index: 20;
 }
 .sticker.is-grabbed .sticker-inner {
@@ -353,10 +793,10 @@ h2 {
   background: var(--azure);
 }
 .sticky--citron {
-  background: #e3e7b8;
+  background: var(--note-citron);
 }
 .sticky--blush {
-  background: #fbeef2;
+  background: var(--note-blush);
 }
 .sticky--moss {
   background: var(--citron);
@@ -376,7 +816,7 @@ h2 {
   writing-mode: vertical-rl;
   rotate: 180deg;
   background: var(--pink);
-  color: #fff;
+  color: var(--on-accent);
   padding: 0.5rem 0.35rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -408,9 +848,9 @@ h2 {
   padding: 0.8rem 1.6rem;
   border-radius: 999px;
   background: var(--moss);
-  color: #fff;
+  color: var(--on-accent);
   border: 2px solid var(--moss);
-  box-shadow: 0 5px 0 var(--moss-deep);
+  box-shadow: 0 5px 0 var(--btn-shadow);
   transition: translate 0.25s ease-out, box-shadow 0.2s, background 0.2s, scale 0.3s var(--bounce);
   position: relative;
 }
@@ -419,17 +859,18 @@ h2 {
   z-index: 1;
 }
 .btn:hover {
+  color: var(--on-deep);
   background: var(--pink-deep);
   border-color: var(--pink-deep);
-  box-shadow: 0 5px 0 #8e4a6a;
+  box-shadow: 0 5px 0 var(--btn-hover-shadow);
   scale: 1.05;
 }
 .btn:active {
-  box-shadow: 0 1px 0 var(--moss-deep);
+  box-shadow: 0 1px 0 var(--btn-shadow);
   scale: 0.97;
 }
 .btn--ghost {
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   border: 2px dashed var(--pink);
   box-shadow: 0 5px 0 var(--blush);
@@ -451,9 +892,9 @@ h2 {
 .marquee {
   overflow: hidden;
   background: var(--moss);
-  color: #fff;
+  color: var(--on-accent);
   padding: 0.75rem 0;
-  border-block: 3px solid #fff;
+  border-block: 3px solid var(--edge);
   outline: 2px dashed var(--citron);
   outline-offset: -8px;
   rotate: -1.2deg;
@@ -476,7 +917,7 @@ h2 {
 }
 .marquee i {
   font-style: normal;
-  color: var(--blush);
+  color: var(--marquee-flower);
   margin-left: 2rem;
   display: inline-block;
   animation: spin 6s linear infinite;
@@ -505,7 +946,7 @@ h2 {
   font-size: var(--sz, 14px);
   line-height: 1;
   translate: -50% -50%;
-  text-shadow: 0 0 1px #fff;
+  text-shadow: 0 0 1px var(--bg);
 }
 .trail {
   animation: trail 0.9s ease-out forwards;
@@ -550,17 +991,18 @@ h2 {
   line-height: 1;
   position: relative;
 }
-.hero-title > em {
+.hero-title em {
   font-weight: 400;
   color: var(--moss-deep);
 }
-.hero-title svg {
+.hero-title > svg {
   display: inline-block;
   vertical-align: top;
   margin-left: 0.3rem;
   animation: spin 9s linear infinite;
 }
 .hero-hello {
+  position: relative;
   display: block;
   font-size: 0.5em;
   margin-bottom: 0.4rem;
@@ -575,26 +1017,109 @@ h2 {
   white-space: nowrap;
   z-index: 0;
 }
-.hl::after {
-  content: '';
+.hl-line {
   position: absolute;
-  left: -4px;
-  right: -6px;
-  bottom: 0.08em;
-  height: 0.38em;
-  background: var(--pink);
-  opacity: 0.55;
+  left: -3%;
+  width: 106%;
+  bottom: -0.2em;
+  height: 0.42em;
+  overflow: visible;
+  pointer-events: none;
   z-index: -1;
-  border-radius: 40% 60% 50% 40%;
-  rotate: -1.5deg;
-  transform-origin: left;
-  animation: marker 1s 0.5s var(--bounce) both;
 }
-@keyframes marker {
-  from {
-    scale: 0 1;
+/* every doodle path is drawn on like a pen stroke */
+.doodle path,
+.hl-line path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* --len is each line's real measured length (set in hooks.js), so the "pen"
+     always travels the whole way: dash = len, gap = 2 x len. */
+  stroke-dasharray: var(--len, 4000) calc(var(--len, 4000) * 2);
+  stroke-dashoffset: var(--len, 4000);
+  animation: pen 0.9s cubic-bezier(0.6, 0, 0.3, 1) var(--delay, 0.6s) forwards;
+}
+.hl-line .line-main {
+  stroke: var(--doodle);
+  stroke-width: 6;
+  --delay: 0.7s;
+}
+.hl-line .line-echo {
+  stroke: var(--doodle-2);
+  stroke-width: 2.6;
+  --delay: 1.25s;
+}
+@keyframes pen {
+  to {
+    stroke-dashoffset: 0;
   }
 }
+.doodle {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  stroke: var(--doodle);
+  stroke-width: 2.6;
+}
+.doodle--green {
+  stroke: var(--doodle-2);
+}
+.doodle-wiggle {
+  animation: doodle-bob 3.2s ease-in-out 2.2s infinite;
+}
+@keyframes doodle-bob {
+  50% {
+    rotate: 8deg;
+    scale: 1.08;
+  }
+}
+.d-burst {
+  width: 0.62em;
+  height: 0.62em;
+  left: -0.58em;
+  top: -0.2em;
+  stroke-width: 3.2;
+  --delay: 0.2s;
+}
+.d-heart {
+  width: 0.5em;
+  height: 0.5em;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.15em;
+  --delay: 1.6s;
+}
+.d-star {
+  width: 0.3em;
+  height: 0.3em;
+  right: -0.32em;
+  top: -0.12em;
+  --delay: 1.9s;
+}
+.d-loop {
+  width: 1.1em;
+  height: 0.55em;
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+  margin-left: 0.12em;
+  --delay: 2.1s;
+}
+.d-dots {
+  width: 0.7em;
+  height: 0.25em;
+  left: 0.1em;
+  bottom: -0.32em;
+  --delay: 2.4s;
+}
+.doodle path {
+  animation-delay: var(--delay);
+}
+.hero-hello .d-heart {
+  font-size: 1.4em;
+}
+
 .hero-role {
   font-size: 1.85rem;
   color: var(--pink-deep);
@@ -725,10 +1250,10 @@ h2 {
   background: var(--azure);
 }
 .peek--citron {
-  background: #e3e7b8;
+  background: var(--note-citron);
 }
 .peek--blush {
-  background: #fff;
+  background: var(--surface);
   border: 2px dashed var(--pink);
 }
 .peek h3 {
@@ -791,9 +1316,10 @@ h2 {
 
 .notebook {
   position: relative;
-  background-color: #fff;
-  background-image: linear-gradient(90deg, transparent 54px, rgba(224, 163, 187, 0.6) 54px 56px, transparent 56px),
-    repeating-linear-gradient(transparent 0 33px, var(--azure) 33px 35px);
+  color: var(--notebook-ink);
+  background-color: var(--notebook-bg);
+  background-image: linear-gradient(90deg, transparent 54px, var(--margin-line) 54px 56px, transparent 56px),
+    repeating-linear-gradient(transparent 0 33px, var(--notebook-line) 33px 35px);
   background-position: 0 14px;
   padding: 2.4rem 2rem 2rem 4.6rem;
   line-height: 35px;
@@ -813,22 +1339,22 @@ h2 {
   top: 30px;
   bottom: 30px;
   width: 16px;
-  background: radial-gradient(circle, var(--cream) 6px, rgba(75, 59, 64, 0.15) 7px, transparent 8px) 0 0 / 16px 70px repeat-y;
+  background: radial-gradient(circle, var(--bg) 6px, rgba(var(--shadow-rgb), 0.15) 7px, transparent 8px) 0 0 / 16px 70px repeat-y;
 }
 .notebook p {
   margin: 0 0 35px;
 }
 .notebook em {
-  color: var(--pink-deep);
+  color: var(--letter-accent);
   font-family: var(--font-display);
 }
 .notebook-hi {
   font-size: 2rem;
-  color: var(--pink-deep);
+  color: var(--letter-accent);
 }
 .notebook-sign {
   font-size: 1.8rem;
-  color: var(--moss-deep);
+  color: var(--letter-accent-2);
   margin: 0 !important;
   display: flex;
   align-items: center;
@@ -855,12 +1381,6 @@ h2 {
   display: block;
   width: 100%;
   height: 100%;
-  transition: transform 0.7s var(--bounce);
-  transform-style: preserve-3d;
-}
-.flip:hover .flip-inner,
-.flip.is-flipped .flip-inner {
-  transform: rotateY(180deg);
 }
 .flip-face {
   position: absolute;
@@ -868,8 +1388,25 @@ h2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  /* each side turns on its own and swaps visibility at the halfway point,
+     so it never relies on backface-visibility (which some Chrome setups render blank) */
+  transform: perspective(900px) rotateY(0deg);
+  transition: transform 0.6s cubic-bezier(0.45, 0, 0.25, 1), opacity 0s linear 0.3s;
+}
+.flip-back {
+  transform: perspective(900px) rotateY(-180deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.flip:hover .flip-face--front,
+.flip.is-flipped .flip-face--front {
+  transform: perspective(900px) rotateY(180deg);
+  opacity: 0;
+}
+.flip:hover .flip-back,
+.flip.is-flipped .flip-back {
+  transform: perspective(900px) rotateY(0deg);
+  opacity: 1;
 }
 .flip-front {
   font-size: 2.2rem;
@@ -882,7 +1419,6 @@ h2 {
   font-size: 0.78rem;
 }
 .flip-back {
-  transform: rotateY(180deg);
   font-size: 1.02rem;
   line-height: 1.45;
 }
@@ -920,7 +1456,7 @@ h2 {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
   border: 2px solid var(--pink);
   display: grid;
   place-items: center;
@@ -970,14 +1506,14 @@ h2 {
 }
 .skill-card {
   position: relative;
-  background: #fff;
+  background: var(--surface);
   padding: 2.4rem 1.6rem 1.8rem;
   border-radius: 8px;
   box-shadow: var(--shadow);
   border-top: 10px solid var(--pink);
 }
 .skill-card--azure {
-  border-top-color: #b9d3d5;
+  border-top-color: var(--tape-azure);
 }
 .skill-card--citron {
   border-top-color: var(--citron);
@@ -1028,19 +1564,19 @@ h2 {
   padding: 0.45rem 0.95rem;
   border-radius: 999px;
   background: var(--blush);
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 1.5px var(--pink), 0 3px 0 rgba(75, 59, 64, 0.1);
+  border: 2px solid var(--edge);
+  box-shadow: 0 0 0 1.5px var(--pink), 0 3px 0 rgba(var(--shadow-rgb), 0.1);
   font-size: 0.92rem;
   font-weight: 500;
   transition: rotate 0.35s var(--bounce), scale 0.35s var(--bounce), background 0.2s;
 }
 .skill-card--azure .chip {
   background: var(--azure);
-  box-shadow: 0 0 0 1.5px #a9c7c9, 0 3px 0 rgba(75, 59, 64, 0.1);
+  box-shadow: 0 0 0 1.5px var(--chip-azure-ring), 0 3px 0 rgba(var(--shadow-rgb), 0.1);
 }
 .skill-card--citron .chip {
-  background: #e9ecc6;
-  box-shadow: 0 0 0 1.5px var(--citron), 0 3px 0 rgba(75, 59, 64, 0.1);
+  background: var(--chip-citron);
+  box-shadow: 0 0 0 1.5px var(--citron), 0 3px 0 rgba(var(--shadow-rgb), 0.1);
 }
 .chips li:nth-child(odd) .chip:hover {
   rotate: -5deg;
@@ -1054,8 +1590,8 @@ h2 {
 }
 .chip.is-picked {
   background: var(--pink-deep) !important;
-  color: #fff;
-  box-shadow: 0 0 0 2px var(--pink-deep), 0 6px 14px -4px rgba(184, 99, 138, 0.6) !important;
+  color: var(--on-deep);
+  box-shadow: 0 0 0 2px var(--pink-deep), 0 6px 14px -4px rgba(var(--accent-rgb), 0.6) !important;
   scale: 1.08;
 }
 /* tooltip */
@@ -1070,7 +1606,7 @@ h2 {
   padding: 0.4rem 0.7rem;
   border-radius: 8px;
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
   font-size: 0.75rem;
   font-weight: 400;
   line-height: 1.35;
@@ -1088,7 +1624,7 @@ h2 {
   top: -12px;
   right: -12px;
   background: var(--moss);
-  color: #fff;
+  color: var(--on-accent);
   font-family: var(--font-hand);
   font-size: 0.95rem;
   padding: 0 0.4rem;
@@ -1142,7 +1678,7 @@ h2 {
 .shelf-item.is-glow {
   scale: 1.06;
   rotate: -2deg;
-  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--pink), var(--shadow-lift);
+  box-shadow: 0 0 0 3px var(--edge), 0 0 0 5px var(--pink), var(--shadow-lift);
 }
 .shelf-item.is-glow:nth-child(even) {
   rotate: 2deg;
@@ -1162,7 +1698,7 @@ h2 {
   padding: 0.3rem 1.1rem;
   border-radius: 999px;
   border: 2px dashed var(--pink);
-  background: #fff;
+  background: var(--surface);
   transition: scale 0.3s var(--bounce), background 0.2s, color 0.2s;
 }
 .filter:hover {
@@ -1171,7 +1707,7 @@ h2 {
 }
 .filter.is-on {
   background: var(--pink);
-  color: #fff;
+  color: var(--on-accent);
   border-style: solid;
   border-color: var(--pink);
 }
@@ -1186,7 +1722,7 @@ h2 {
   display: flex;
   flex-direction: column;
   text-align: left;
-  background: #fff;
+  background: var(--surface);
   padding: 14px;
   border-radius: 6px;
   box-shadow: var(--shadow);
@@ -1219,7 +1755,7 @@ h2 {
   background: var(--azure);
 }
 .project--citron .project-img {
-  background: #e3e7b8;
+  background: var(--note-citron);
 }
 .project-img img {
   width: 100%;
@@ -1239,7 +1775,7 @@ h2 {
   position: absolute;
   right: 12px;
   bottom: 12px;
-  background: #fff;
+  background: var(--surface);
   padding: 0.1rem 0.8rem;
   border-radius: 999px;
   font-size: 1.25rem;
@@ -1293,7 +1829,7 @@ h2 {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(75, 59, 64, 0.35);
+  background: rgba(var(--shadow-rgb), 0.35);
   backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
@@ -1313,7 +1849,7 @@ h2 {
   background: var(--paper);
   border-radius: 10px;
   padding: 2.6rem 2.4rem 2.2rem;
-  box-shadow: 0 30px 80px -20px rgba(75, 59, 64, 0.5);
+  box-shadow: 0 30px 80px -20px rgba(var(--shadow-rgb), 0.5);
   animation: sheet-in 0.55s var(--bounce) both;
   outline: none;
   border-top: 12px solid transparent;
@@ -1339,7 +1875,7 @@ h2 {
 .modal-close:hover {
   rotate: 90deg;
   background: var(--pink);
-  color: #fff;
+  color: var(--on-accent);
 }
 .case h2 {
   margin: 0;
@@ -1374,7 +1910,7 @@ h2 {
 }
 .case-shot {
   display: block;
-  background: #fff;
+  background: var(--surface);
   padding: 8px;
   box-shadow: var(--shadow);
   rotate: var(--rot);
@@ -1437,112 +1973,284 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10rem 0 1rem;
+  padding: 13rem 0 2rem;
 }
-.envelope {
+.env-stage {
   position: relative;
-  width: min(440px, 92vw);
+  width: min(440px, 86vw);
   aspect-ratio: 1.6;
-  transition: translate 0.7s var(--bounce), rotate 0.5s var(--bounce), opacity 0.7s;
-  rotate: -2deg;
+  display: grid;
 }
-.envelope:hover {
-  rotate: 1deg;
+
+/* --- the magic behind the envelope --- */
+.env-rays,
+.env-glow,
+.env-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  pointer-events: none;
+  border-radius: 50%;
 }
-.env-back,
-.env-front,
-.env-flap {
+.env-rays {
+  width: 175%;
+  aspect-ratio: 1;
+  background: repeating-conic-gradient(from 0deg, var(--ray) 0 5deg, transparent 5deg 15deg);
+  mask-image: radial-gradient(circle, #000 18%, transparent 64%);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 64%);
+  opacity: 0.55;
+  animation: spin 70s linear infinite;
+  transition: opacity 0.6s, scale 0.9s var(--bounce);
+}
+.env-glow {
+  width: 120%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 62%);
+  animation: breathe 4s ease-in-out infinite;
+}
+.env-ring {
+  width: 128%;
+  aspect-ratio: 1;
+  border: 2px dashed var(--ring);
+  animation: spin 40s linear infinite reverse;
+  transition: scale 0.9s var(--bounce), opacity 0.5s;
+}
+.env-ring::before {
+  /* a tiny heart riding the ring */
+  content: '♡';
+  position: absolute;
+  top: -0.75em;
+  left: 50%;
+  color: var(--pink-deep);
+  font-size: 1.3rem;
+}
+.env-stage.is-open .env-rays {
+  opacity: 0.95;
+  scale: 1.15;
+  animation-duration: 25s;
+}
+.env-stage.is-open .env-ring {
+  scale: 1.1;
+}
+@keyframes breathe {
+  50% {
+    scale: 1.08;
+    opacity: 0.8;
+  }
+}
+.twinkle {
+  position: absolute;
+  translate: -50% -50%;
+  pointer-events: none;
+  animation: twinkle 2.6s ease-in-out var(--d) infinite;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    scale: 0.55;
+    opacity: 0.35;
+  }
+  50% {
+    scale: 1.1;
+    opacity: 1;
+  }
+}
+.floaties {
   position: absolute;
   inset: 0;
-  border-radius: 8px;
+  pointer-events: none;
+  z-index: 0;
+}
+.floaties i {
+  position: absolute;
+  left: var(--x);
+  top: 30%;
+  font-style: normal;
+  font-size: var(--s);
+  color: var(--pink-deep);
+  opacity: 0;
+}
+.floaties i:nth-child(3n + 2) {
+  color: var(--moss-deep);
+}
+.env-stage.is-open .floaties i {
+  animation: float-up 3.4s ease-out var(--d) infinite;
+}
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-260px) translateX(var(--drift)) scale(1.2) rotate(40deg);
+  }
+}
+
+/* --- the envelope itself --- */
+.envelope {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  rotate: -2deg;
+  transition: rotate 0.5s var(--bounce), scale 0.5s var(--bounce);
+}
+.envelope:hover {
+  scale: 1.03;
+  animation: env-wiggle 0.7s ease-in-out;
+}
+@keyframes env-wiggle {
+  0%,
+  100% {
+    rotate: -2deg;
+  }
+  30% {
+    rotate: 1.5deg;
+  }
+  60% {
+    rotate: -1deg;
+  }
 }
 .env-back {
-  background: var(--pink);
+  position: absolute;
+  inset: 0;
+  /* same rounding as the flap & pocket corners (8 of 160 units) */
+  border-radius: calc(100% * 8 / 160) / calc(100% * 8 / 100);
+  /* striped lining you can see inside the V */
+  background: repeating-linear-gradient(135deg, var(--lining-a) 0 9px, var(--lining-b) 9px 18px);
   box-shadow: var(--shadow-lift);
 }
-.env-front {
-  background: linear-gradient(to top right, var(--blush) 50%, transparent 50.3%) left / 50.5% 100% no-repeat,
-    linear-gradient(to top left, #f9e8ee 50%, transparent 50.3%) right / 50.5% 100% no-repeat,
-    linear-gradient(to top, #f7e4eb 0 0) bottom / 100% 0% no-repeat;
-  clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
-  background: linear-gradient(160deg, #fbeef2, var(--blush));
+.env-pocket,
+.env-flap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.env-pocket {
   z-index: 3;
+  filter: drop-shadow(0 -2px 3px rgba(var(--shadow-rgb), 0.12));
+}
+.pocket-body {
+  fill: var(--env-body);
+}
+.pocket-fold {
+  fill: none;
+  stroke: var(--env-fold);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
 }
 .env-flap {
-  background: #e9b9cb;
-  clip-path: polygon(0 0, 100% 0, 50% 60%);
-  transform-origin: top;
-  transition: transform 0.6s var(--bounce) 0.25s, z-index 0s 0.5s;
   z-index: 4;
+  transform-origin: 50% 0;
+  transform: perspective(700px) rotateX(0deg);
+  filter: drop-shadow(0 4px 4px rgba(var(--shadow-rgb), 0.18));
+  /* closing: wait for the letter to slide down, then fold over */
+  transition: transform 0.55s cubic-bezier(0.5, 0, 0.3, 1) 0.35s, z-index 0s linear 0.6s;
+}
+.flap-body {
+  fill: var(--env-flap);
+}
+.flap-edge {
+  fill: none;
+  stroke: var(--env-fold);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.envelope.is-open .env-flap {
+  transform: perspective(700px) rotateX(180deg);
+  z-index: 1;
+  transition: transform 0.55s cubic-bezier(0.5, 0, 0.3, 1), z-index 0s linear 0.28s;
 }
 .env-seal {
   position: absolute;
   left: 50%;
-  top: 60%;
-  translate: -50% -60%;
+  top: 58%;
+  translate: -50% -50%;
   z-index: 5;
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: var(--moss);
+  background: var(--seal);
   display: grid;
   place-items: center;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.6), var(--shadow);
-  transition: opacity 0.3s, scale 0.4s var(--bounce);
+  box-shadow: 0 0 0 4px var(--seal-ring), var(--shadow);
+  /* when closing, wait for the flap to fold back before the seal returns */
+  transition: opacity 0.3s 0.85s, scale 0.45s var(--bounce) 0.85s, rotate 0.5s var(--bounce);
 }
 .envelope:hover .env-seal {
   scale: 1.1;
   rotate: 15deg;
 }
-.letter {
-  position: absolute;
-  left: 6%;
-  right: 6%;
-  top: 6%;
-  height: 88%;
-  background: #fff;
-  background-image: repeating-linear-gradient(transparent 0 25px, var(--azure) 25px 26px);
-  border-radius: 4px;
-  padding: 1rem 1.2rem;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  text-align: left;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  box-shadow: 0 4px 12px rgba(75, 59, 64, 0.12);
-  transition: translate 0.7s var(--bounce);
-}
-.letter-hi {
-  font-size: 1.7rem;
-  color: var(--pink-deep);
-  line-height: 1;
-}
-.letter-sign {
-  font-size: 1.4rem;
-  color: var(--moss-deep);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-.envelope.is-open .env-flap {
-  transform: rotateX(180deg);
-  z-index: 1;
-  transition: transform 0.5s ease, z-index 0s 0.2s;
-}
-.envelope.is-open .letter {
-  translate: 0 -62%;
-  transition-delay: 0.35s;
-}
 .envelope.is-open .env-seal {
   opacity: 0;
   scale: 0.4;
+  transition: opacity 0.25s, scale 0.3s;
+}
+.letter {
+  --row: 26px;
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 6%;
+  height: 90%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 22px;
+  border-radius: 12px;
+  text-align: left;
+  color: var(--letter-ink);
+  font-size: 0.9rem;
+  line-height: var(--row);
+  /* ruled lines sit exactly under each line of text */
+  background-color: var(--letter-bg);
+  background-image: linear-gradient(90deg, transparent 12px, var(--margin-line) 12px 13.5px, transparent 13.5px),
+    repeating-linear-gradient(transparent 0 calc(var(--row) - 1px), var(--letter-line) calc(var(--row) - 1px) var(--row));
+  background-origin: content-box, content-box;
+  background-position: -22px 0, 0 0;
+  background-repeat: no-repeat, repeat;
+  box-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.15);
+  transition: translate 0.5s cubic-bezier(0.5, 0, 0.3, 1);
+}
+.letter-hi {
+  font-size: 1.75rem;
+  line-height: var(--row);
+  color: var(--letter-accent);
+  padding-top: 2px;
+}
+.letter-body {
+  margin-top: var(--row);
+}
+.letter-sign {
+  margin-top: var(--row);
+  align-self: flex-end;
+  font-size: 1.45rem;
+  line-height: var(--row);
+  color: var(--letter-accent-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.envelope.is-open .letter {
+  translate: 0 -76%;
+  transition: translate 0.8s var(--bounce) 0.4s;
 }
 .env-hint {
   font-size: 1.4rem;
   color: var(--pink-deep);
-  margin-top: 1.2rem;
+  margin-top: 2.6rem;
+  position: relative;
+  z-index: 1;
 }
 .c1 {
   top: 40px;
@@ -1562,16 +2270,16 @@ h2 {
   --c: var(--blush);
   position: relative;
   rotate: var(--rot);
-  background: #fff;
-  border: 9px dotted var(--cream);
-  outline: 2px solid #fff;
-  filter: drop-shadow(0 10px 14px rgba(75, 59, 64, 0.18));
+  background: var(--surface);
+  border: 9px dotted var(--bg);
+  outline: 2px solid var(--edge);
+  filter: drop-shadow(0 10px 14px rgba(var(--shadow-rgb), 0.18));
   transition: rotate 0.45s var(--bounce), scale 0.45s var(--bounce), translate 0.7s var(--bounce), opacity 0.7s, filter 0.3s;
 }
 .stamp:hover {
   rotate: 0deg;
   scale: 1.07;
-  filter: drop-shadow(0 18px 20px rgba(75, 59, 64, 0.25));
+  filter: drop-shadow(0 18px 20px rgba(var(--shadow-rgb), 0.25));
 }
 .stamp--pink {
   --c: var(--blush);
@@ -1580,10 +2288,10 @@ h2 {
   --c: var(--azure);
 }
 .stamp--citron {
-  --c: #e3e7b8;
+  --c: var(--note-citron);
 }
 .stamp--blush {
-  --c: #fbeef2;
+  --c: var(--note-blush);
 }
 .stamp-inner {
   display: flex;
@@ -1594,7 +2302,7 @@ h2 {
   padding: 1.4rem 0.8rem 1.2rem;
   margin: 6px;
   background: var(--c);
-  border: 1.5px solid rgba(75, 59, 64, 0.15);
+  border: 1.5px solid rgba(var(--shadow-rgb), 0.15);
   text-decoration: none;
   position: relative;
   min-height: 200px;
@@ -1615,7 +2323,7 @@ h2 {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #fff;
+  background: var(--surface);
   color: var(--pink-deep);
   margin-bottom: 0.4rem;
   transition: rotate 0.6s var(--bounce), background 0.2s, color 0.2s;
@@ -1623,7 +2331,7 @@ h2 {
 .stamp:hover .stamp-icon {
   rotate: 360deg;
   background: var(--moss);
-  color: #fff;
+  color: var(--on-accent);
 }
 .stamp b {
   font-family: var(--font-display);
@@ -1645,8 +2353,8 @@ h2 {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(184, 99, 138, 0.55);
-  color: rgba(184, 99, 138, 0.75);
+  border: 2px solid rgba(var(--accent-rgb), 0.55);
+  color: rgba(var(--accent-rgb), 0.75);
   display: grid;
   place-items: center;
   font-size: 0.6rem;
@@ -1670,7 +2378,7 @@ h2 {
   font-weight: 700;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--pink-deep);
   border: 1.5px solid var(--pink);
   transition: scale 0.3s var(--bounce);
@@ -1704,6 +2412,18 @@ h2 {
 }
 
 /* ============ responsive ============ */
+@media (max-width: 1180px) {
+  .scrap {
+    scale: 0.8;
+  }
+  .scrap--left {
+    left: calc(var(--out, 48px) * -1 - 22px);
+  }
+  .scrap--right {
+    right: calc(var(--out, 48px) * -1 - 22px);
+  }
+}
+
 @media (max-width: 980px) {
   .hero {
     grid-template-columns: 1fr;
@@ -1736,19 +2456,61 @@ h2 {
 }
 
 @media (max-width: 720px) {
+  .dd-shelf-l {
+    left: 4%;
+    top: 0.6rem;
+  }
+  .dd-shelf-r {
+    right: 4%;
+    top: 0.6rem;
+  }
+  .dd-lede-arrow,
+  .dd-grid-mid,
+  .filters-hint,
+  .dd-grid-tr,
+  .dd-grid-bl,
+  .dd-stamps-heart {
+    display: none;
+  }
+  /* on phones only the very edges of the scraps peek in, so they never sit under text */
+  .scrap {
+    scale: 0.5;
+  }
+  .scrap--left {
+    left: -100px;
+  }
+  .scrap--right {
+    right: -100px;
+  }
+  .scrap:nth-child(3n) {
+    display: none;
+  }
   body {
     font-size: 16px;
   }
   .topbar {
     flex-direction: column;
-    padding: 1.4rem 1rem 0.4rem;
+    padding: 2.7rem 1rem 0.2rem;
+  }
+  .logo {
+    margin-right: 56px;
+  }
+  .logo-name {
+    font-size: 1.25rem;
   }
   .tabs {
     justify-content: center;
   }
   .tab {
     font-size: 1.2rem;
-    padding: 0.4rem 0.8rem 0.45rem;
+    padding: 0.45rem 0.85rem 0.5rem;
+  }
+  .theme-toggle {
+    position: absolute;
+    top: 2.4rem;
+    right: 1rem;
+    width: 42px;
+    height: 42px;
   }
   .wrap {
     padding: 2.5rem 1rem 3rem;
@@ -1805,7 +2567,7 @@ h2 {
   }
   .notebook {
     padding: 2rem 1.2rem 1.6rem 3.4rem;
-    background-image: linear-gradient(90deg, transparent 40px, rgba(224, 163, 187, 0.6) 40px 42px, transparent 42px),
+    background-image: linear-gradient(90deg, transparent 40px, var(--margin-line) 40px 42px, transparent 42px),
       repeating-linear-gradient(transparent 0 33px, var(--azure) 33px 35px);
   }
   .notebook::before {
@@ -1833,15 +2595,35 @@ h2 {
     grid-template-columns: repeat(2, 1fr);
   }
   .letter {
-    font-size: 0.78rem;
-    line-height: 1.4;
-    padding: 0.7rem 0.9rem;
+    --row: 20px;
+    font-size: 0.76rem;
+    padding: 10px 14px;
+    background-position: -14px 0, 0 0;
   }
   .letter-hi {
     font-size: 1.4rem;
   }
+  .letter-body {
+    margin-top: 6px;
+  }
+  .letter-sign {
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+  .envelope.is-open .letter {
+    translate: 0 -72%;
+  }
   .envelope-zone {
-    padding-top: 8rem;
+    padding-top: 9rem;
+  }
+  .topbar {
+    gap: 0.8rem;
+  }
+  .nav-wrap {
+    flex-direction: column-reverse;
+  }
+  .tabs {
+    border-radius: 28px;
   }
 }
 

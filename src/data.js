@@ -16,7 +16,7 @@ export const profile = {
   about:
     'I am a Computer Science student at BINUS University with interests in UI/UX design, front-end development, and digital product innovation. I enjoy creating user-centered solutions that combine technology, functionality, and accessibility.',
   about2:
-    'Through academic and personal projects, I have designed web and mobile interfaces across healthcare, education, travel, and AI-powered applications — while collaborating in multidisciplinary teams.',
+    'Through academic and personal projects, I have designed web and mobile interfaces across healthcare, education, travel, and AI-powered applications, while collaborating in multidisciplinary teams.',
 }
 
 export const contacts = [
